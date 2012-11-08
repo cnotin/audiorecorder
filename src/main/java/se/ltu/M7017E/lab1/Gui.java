@@ -1,8 +1,8 @@
 package se.ltu.M7017E.lab1;
 
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
 
@@ -96,10 +96,8 @@ public class Gui extends JFrame {
 		 * PipelinePositionModel: useful class from java-gstreamer, helps to
 		 * keep the boundaries and the cursor in sync with the stream
 		 */
-		playerPositionModel = new PipelinePositionModel(
-				app.getPlayer());
-		recorderPositionModel = new PipelinePositionModel(
-				app.getRecorder());
+		playerPositionModel = new PipelinePositionModel(app.getPlayer());
+		recorderPositionModel = new PipelinePositionModel(app.getRecorder());
 
 		slider.setModel(recorderPositionModel);
 
@@ -146,7 +144,7 @@ public class Gui extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					selection = (String) filesLst.getSelectedValue();
-				System.out.println(selection);
+					System.out.println(selection);
 				}
 				// TODO Auto-generated method stub
 
@@ -172,9 +170,9 @@ public class Gui extends JFrame {
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 
 		recBtn = new JButton("REC");
-		recBtn.addMouseListener(new MouseListener() {
+		recBtn.addActionListener(new ActionListener() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				System.out.println("record click");
 
 				slider.setModel(recorderPositionModel);
@@ -189,71 +187,27 @@ public class Gui extends JFrame {
 					filesLstModel.addElement(app.startRecording());
 				}
 			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// NOTHING
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// NOTHING
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// NOTHING
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// NOTHING
-			}
 		});
 		buttons.add(recBtn);
 
 		playBtn = new JButton("PLAY");
-		playBtn.addMouseListener(new MouseListener() {
+		playBtn.addActionListener(new ActionListener() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("play " + selection);
 
-				if (!app.isPlaying()){
+				// "selection" is null if file list is empty
+				if (selection != null && !app.isPlaying()) {
 					slider.setModel(playerPositionModel);
 					app.startPlayer(selection);
 					playBtn.setText("PAUSE");
-				}else{
+				} else {
 					app.pausePlayer();
 					playBtn.setText("PLAY");
 				}
-
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 		});
-		
+
 		buttons.add(playBtn);
 
 		return buttons;
