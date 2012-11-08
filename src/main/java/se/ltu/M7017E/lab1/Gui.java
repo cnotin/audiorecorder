@@ -23,8 +23,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import lombok.Getter;
-
 import org.gstreamer.Format;
 import org.gstreamer.swing.PipelinePositionModel;
 
@@ -39,8 +37,9 @@ public class Gui extends JFrame {
 	private JLabel timeLbl;
 	private JList filesLst;
 	private String selection; // file selected for play
-	@Getter
 	private DefaultListModel filesLstModel;
+	private PipelinePositionModel playerPositionModel;
+	private PipelinePositionModel recorderPositionModel;
 
 	public Gui() {
 		// app holds the business logic of the app
@@ -82,7 +81,7 @@ public class Gui extends JFrame {
 	 * Formats it to a nice HH:MM:SS string.
 	 */
 	private void updateTimeLbl() {
-		long position = app.getRecorderPipe().queryPosition(Format.TIME);
+		long position = app.getRecorder().queryPosition(Format.TIME);
 		// 10^9, convert from nanoseconds to second
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
@@ -92,12 +91,18 @@ public class Gui extends JFrame {
 	private JPanel createSlider() {
 		JPanel panel = new JPanel();
 
-		this.slider = new JSlider(0, 100);
+		this.slider = new JSlider();
 		/*
 		 * PipelinePositionModel: useful class from java-gstreamer, helps to
 		 * keep the boundaries and the cursor in sync with the stream
 		 */
-		slider.setModel(new PipelinePositionModel(app.getRecorderPipe()));
+		playerPositionModel = new PipelinePositionModel(
+				app.getPlayer());
+		recorderPositionModel = new PipelinePositionModel(
+				app.getRecorder());
+
+		slider.setModel(recorderPositionModel);
+
 		this.slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -172,6 +177,8 @@ public class Gui extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("record click");
 
+				slider.setModel(recorderPositionModel);
+
 				if (app.isRecording()) {
 					// stop recording
 					app.recording(Action.STOP);
@@ -208,8 +215,10 @@ public class Gui extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("play " + selection);
-				app.play(selection);
 
+				slider.setModel(playerPositionModel);
+
+				app.play(selection);
 			}
 
 			@Override
