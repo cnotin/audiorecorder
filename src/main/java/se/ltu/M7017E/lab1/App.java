@@ -3,12 +3,15 @@ package se.ltu.M7017E.lab1;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import lombok.Getter;
+
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Pipeline;
 import org.gstreamer.State;
 
 public class App {
+	@Getter
 	final Pipeline recorderPipe;
 
 	private boolean isRecording = false;
@@ -56,4 +59,5 @@ public class App {
 	public boolean isRecording() {
 		return isRecording;
 	}
+
 }

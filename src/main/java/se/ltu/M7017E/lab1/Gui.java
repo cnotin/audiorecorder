@@ -22,6 +22,9 @@ import javax.swing.event.ChangeListener;
 
 import lombok.Getter;
 
+import org.gstreamer.Format;
+import org.gstreamer.swing.PipelinePositionModel;
+
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
@@ -66,16 +69,22 @@ public class Gui extends JFrame {
 		this.add(createFilesList());
 	}
 
+	private void updateTimeLbl() {
+		long position = app.getRecorderPipe().queryPosition(Format.TIME);
+		position = position / 1000000000L;
+		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
+				(position % 3600) / 60, position % 60));
+	}
+
 	private JPanel createSlider() {
 		JPanel panel = new JPanel();
 
 		this.slider = new JSlider(0, 100);
+		slider.setModel(new PipelinePositionModel(app.getRecorderPipe()));
 		this.slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				JSlider source = (JSlider) e.getSource();
-				int value = (int) source.getValue();
-				timeLbl.setText(String.valueOf(value));
+				updateTimeLbl();
 			}
 		});
 		// TODO convertir les labels en HH:mm:ss
