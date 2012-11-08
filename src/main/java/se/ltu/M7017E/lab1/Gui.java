@@ -1,10 +1,13 @@
 package se.ltu.M7017E.lab1;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileFilter;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,23 +20,24 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.gstreamer.Pipeline;
-import org.gstreamer.State;
+import lombok.Getter;
 
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
-	private Pipeline pipe;
+	private App app;
 
 	private JSlider slider;
 	private JLabel timeLbl;
-	private JList<String> filesLst;
+	private JList filesLst;
+	@Getter
+	private DefaultListModel filesLstModel;
 
-	public Gui(Pipeline pipe) {
-		this.pipe = pipe;
+	public Gui() {
+		this.app = new App();
 		this.setTitle("Audio Recorder");
 
-		this.setSize(200, 500);
+		this.setSize(300, 500);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -56,10 +60,10 @@ public class Gui extends JFrame {
 
 		this.getContentPane().setLayout(
 				new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
-		this.add(createTime(), BorderLayout.NORTH);
-		this.add(createControls(), BorderLayout.NORTH);
-		this.add(createSlider(), BorderLayout.NORTH);
-		this.add(createFilesList(), BorderLayout.CENTER);
+		this.add(createTime());
+		this.add(createControls());
+		this.add(createSlider());
+		this.add(createFilesList());
 	}
 
 	private JPanel createSlider() {
@@ -89,11 +93,19 @@ public class Gui extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-		String labels[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
-		this.filesLst = new JList<String>(labels);
+		this.filesLstModel = new DefaultListModel();
+
+		File currDir = new File(".");
+		File[] oggFiles = currDir.listFiles(new OggFilter());
+
+		for (File file : oggFiles) {
+			this.filesLstModel.addElement(file.getName());
+		}
+		this.filesLst = new JList(filesLstModel);
 		JScrollPane scrollPane = new JScrollPane(this.filesLst);
 
 		panel.add(scrollPane);
+		panel.setPreferredSize(new Dimension(300, 400));
 
 		return panel;
 	}
@@ -115,15 +127,19 @@ public class Gui extends JFrame {
 
 		JButton recBtn = new JButton("REC");
 		recBtn.addMouseListener(new MouseListener() {
-
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
+			public void mouseClicked(MouseEvent arg0) {
+				System.out.println("record click");
 
+				if(!app.isRecording()){
+					filesLstModel.addElement(app.record());
+				}else{
+					app.record();
+				}
 			}
 
 			@Override
-			public void mousePressed(MouseEvent arg0) {
+			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
 
 			}
@@ -135,23 +151,15 @@ public class Gui extends JFrame {
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
+			public void mousePressed(MouseEvent arg0) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				System.out.println("record click");
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
 
-				State state = pipe.getState();
-				if (state == State.PLAYING) {
-					System.out.println("stop recording");
-					pipe.setState(State.NULL);
-				} else {
-					System.out.println("start recording");
-					pipe.setState(State.PLAYING);
-				}
 			}
 		});
 
@@ -159,5 +167,11 @@ public class Gui extends JFrame {
 		buttons.add(new JButton("PLAY"));
 
 		return buttons;
+	}
+
+	private class OggFilter implements FileFilter {
+		public boolean accept(File file) {
+			return file.getName().endsWith("ogg");
+		}
 	}
 }

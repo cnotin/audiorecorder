@@ -1,34 +1,59 @@
 package se.ltu.M7017E.lab1;
 
-import javax.swing.SwingUtilities;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
-import org.gstreamer.Gst;
 import org.gstreamer.Pipeline;
+import org.gstreamer.State;
 
 public class App {
-	public static void main(String[] args) {
-		System.out.println("Welcome");
+	final Pipeline recorderPipe;
 
-		args = Gst.init("Audio recorder", args);
-		final Pipeline pipe = new Pipeline("recorder");
+	private boolean isRecording = false;
+
+	public App() {
+		recorderPipe = new Pipeline("recorder");
 		final Element autoaudiosrc = ElementFactory.make("autoaudiosrc",
 				"autoaudiosrc");
 		final Element vorbisenc = ElementFactory.make("vorbisenc", "vorbisenc");
 		vorbisenc.set("bitrate", 64000L);
 		final Element oggmux = ElementFactory.make("oggmux", "oggmux");
 		final Element filesink = ElementFactory.make("filesink", "filesink");
-		filesink.set("location", "test.ogg");
 
-		pipe.addMany(autoaudiosrc, vorbisenc, oggmux, filesink);
+		recorderPipe.addMany(autoaudiosrc, vorbisenc, oggmux, filesink);
 		Pipeline.linkMany(autoaudiosrc, vorbisenc, oggmux, filesink);
+	}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Gui gui = new Gui(pipe);
-				gui.setVisible(true);
-			}
-		});
+	public String record() {
+		String filename = null;
+
+		if (isRecording) {
+			System.out.println("stop recording");
+			
+			recorderPipe.setState(State.NULL);
+			isRecording = false;
+		} else {
+			System.out.println("start recording");
+			
+			filename = genNewFileName();
+			recorderPipe.getElementByName("filesink").set("location", filename);
+			recorderPipe.setState(State.PLAYING);
+			isRecording = true;
+		}
+
+		return filename;
+	}
+
+	public String genNewFileName() {
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+
+		String newFile = date.format(new Date()) + ".ogg";
+		return newFile;
+	}
+
+	public boolean isRecording() {
+		return isRecording;
 	}
 }
