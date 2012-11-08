@@ -15,10 +15,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import lombok.Getter;
 
@@ -33,6 +36,7 @@ public class Gui extends JFrame {
 	private JSlider slider;
 	private JLabel timeLbl;
 	private JList filesLst;
+	private String selection; // file selected for play
 	@Getter
 	private DefaultListModel filesLstModel;
 
@@ -115,7 +119,20 @@ public class Gui extends JFrame {
 
 		panel.add(scrollPane);
 		panel.setPreferredSize(new Dimension(300, 400));
+		this.filesLst.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		ListSelectionListener listener = new ListSelectionListener() {
 
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					selection = (String) filesLst.getSelectedValue();
+				System.out.println(selection);
+				}
+				// TODO Auto-generated method stub
+
+			}
+		};
+		this.filesLst.addListSelectionListener(listener);
 		return panel;
 	}
 
@@ -171,9 +188,43 @@ public class Gui extends JFrame {
 
 			}
 		});
-
 		buttons.add(recBtn);
-		buttons.add(new JButton("PLAY"));
+
+		JButton play=new JButton("PLAY");
+		play.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				System.out.println("play " + selection);
+				app.play(selection);
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		
+		buttons.add(play);
 
 		return buttons;
 	}

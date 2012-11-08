@@ -13,11 +13,14 @@ import org.gstreamer.State;
 public class App {
 	@Getter
 	final Pipeline recorderPipe;
+	@Getter
+	final Pipeline playPipe;
 
 	private boolean isRecording = false;
 
 	public App() {
 		recorderPipe = new Pipeline("recorder");
+		playPipe = new Pipeline("player");
 		final Element autoaudiosrc = ElementFactory.make("autoaudiosrc",
 				"autoaudiosrc");
 		final Element vorbisenc = ElementFactory.make("vorbisenc", "vorbisenc");
@@ -47,6 +50,13 @@ public class App {
 		}
 
 		return filename;
+	}
+
+	/**
+	 * for playing an audio file
+	 */
+	public void play(String file) {
+		System.out.println("playing " + file);
 	}
 
 	public String genNewFileName() {
