@@ -28,6 +28,8 @@ import lombok.Getter;
 import org.gstreamer.Format;
 import org.gstreamer.swing.PipelinePositionModel;
 
+import se.ltu.M7017E.lab1.App.Action;
+
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
@@ -41,14 +43,16 @@ public class Gui extends JFrame {
 	private DefaultListModel filesLstModel;
 
 	public Gui() {
+		// app holds the business logic of the app
 		this.app = new App();
 		this.setTitle("Audio Recorder");
 
 		this.setSize(300, 500);
 		this.setResizable(false);
-		this.setLocationRelativeTo(null);
+		this.setLocationRelativeTo(null);// center window on screen
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+		// use OS' native look'n'feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
@@ -73,8 +77,13 @@ public class Gui extends JFrame {
 		this.add(createFilesList());
 	}
 
+	/**
+	 * Update the time label according to the current position in stream.
+	 * Formats it to a nice HH:MM:SS string.
+	 */
 	private void updateTimeLbl() {
 		long position = app.getRecorderPipe().queryPosition(Format.TIME);
+		// 10^9, convert from nanoseconds to second
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
@@ -84,6 +93,10 @@ public class Gui extends JFrame {
 		JPanel panel = new JPanel();
 
 		this.slider = new JSlider(0, 100);
+		/*
+		 * PipelinePositionModel: useful class from java-gstreamer, helps to
+		 * keep the boundaries and the cursor in sync with the stream
+		 */
 		slider.setModel(new PipelinePositionModel(app.getRecorderPipe()));
 		this.slider.addChangeListener(new ChangeListener() {
 			@Override
@@ -108,7 +121,9 @@ public class Gui extends JFrame {
 
 		this.filesLstModel = new DefaultListModel();
 
+		// look in current directory for recording files
 		File currDir = new File(".");
+		// only ogg files
 		File[] oggFiles = currDir.listFiles(new OggFilter());
 
 		for (File file : oggFiles) {
@@ -157,35 +172,33 @@ public class Gui extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("record click");
 
-				if(!app.isRecording()){
-					filesLstModel.addElement(app.record());
-				}else{
-					app.record();
+				if (app.isRecording()) {
+					// stop recording
+					app.recording(Action.STOP);
+				} else {
+					// start recording and add filename to list of files
+					filesLstModel.addElement(app.recording(Action.START));
 				}
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
+				// NOTHING
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
+				// NOTHING
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
+				// NOTHING
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
+				// NOTHING
 			}
 		});
 		buttons.add(recBtn);
@@ -229,6 +242,9 @@ public class Gui extends JFrame {
 		return buttons;
 	}
 
+	/**
+	 * File filter for OGG files
+	 */
 	private class OggFilter implements FileFilter {
 		public boolean accept(File file) {
 			return file.getName().endsWith("ogg");

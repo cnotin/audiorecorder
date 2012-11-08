@@ -12,13 +12,25 @@ import org.gstreamer.State;
 
 public class App {
 	@Getter
-	final Pipeline recorderPipe;
+	private Pipeline recorderPipe;
 	@Getter
-	final Pipeline playPipe;
+	private Pipeline playPipe;
 
-	private boolean isRecording = false;
+	private SimpleDateFormat filenameFormatter = new SimpleDateFormat(
+			"yyyy-MM-dd-HH-mm-ss");
+
+	public static enum Action {
+		START, STOP
+	};
 
 	public App() {
+		createRecorder();
+	}
+
+	/**
+	 * Create all GStreamer stuff for recording
+	 */
+	private void createRecorder() {
 		recorderPipe = new Pipeline("recorder");
 		playPipe = new Pipeline("player");
 		final Element autoaudiosrc = ElementFactory.make("autoaudiosrc",
@@ -32,21 +44,20 @@ public class App {
 		Pipeline.linkMany(autoaudiosrc, vorbisenc, oggmux, filesink);
 	}
 
-	public String record() {
+	public String recording(Action action) {
 		String filename = null;
 
-		if (isRecording) {
+		if (action == Action.STOP) {
 			System.out.println("stop recording");
 			
 			recorderPipe.setState(State.NULL);
-			isRecording = false;
-		} else {
+		} else if (action == Action.START) {
 			System.out.println("start recording");
 			
 			filename = genNewFileName();
 			recorderPipe.getElementByName("filesink").set("location", filename);
+
 			recorderPipe.setState(State.PLAYING);
-			isRecording = true;
 		}
 
 		return filename;
@@ -60,14 +71,11 @@ public class App {
 	}
 
 	public String genNewFileName() {
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
-
-		String newFile = date.format(new Date()) + ".ogg";
-		return newFile;
+		return filenameFormatter.format(new Date()) + ".ogg";
 	}
 
 	public boolean isRecording() {
-		return isRecording;
+		return (recorderPipe.getState() == State.PLAYING);
 	}
 
 }
