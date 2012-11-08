@@ -6,17 +6,14 @@ import java.util.Date;
 
 import lombok.Getter;
 
-import org.gstreamer.Element;
-import org.gstreamer.ElementFactory;
-import org.gstreamer.Pipeline;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin2;
 
 public class App {
 	@Getter
-	private Pipeline recorder;
+	private Recorder recorder = new Recorder();
 	@Getter
-	private PlayBin2 player;
+	private PlayBin2 player = new PlayBin2("player");
 
 	/**
 	 * Date formatter for recording filenames
@@ -28,51 +25,29 @@ public class App {
 		START, STOP
 	};
 
-	public App() {
-		createRecorder();
-		createPlayer();
-	}
-
 	/**
-	 * Create all GStreamer stuff for recording
+	 * Starts the recording, automatically generating a new filename
+	 * 
+	 * @return the generated filename, including extension
 	 */
-	private void createRecorder() {
-		recorder = new Pipeline("recorder");
-		final Element autoaudiosrc = ElementFactory.make("autoaudiosrc",
-				"autoaudiosrc");
-		final Element vorbisenc = ElementFactory.make("vorbisenc", "vorbisenc");
-		vorbisenc.set("bitrate", 64000L);
-		final Element oggmux = ElementFactory.make("oggmux", "oggmux");
-		final Element filesink = ElementFactory.make("filesink", "filesink");
+	public String startRecording() {
+		System.out.println("start recording");
 
-		recorder.addMany(autoaudiosrc, vorbisenc, oggmux, filesink);
-		Pipeline.linkMany(autoaudiosrc, vorbisenc, oggmux, filesink);
-	}
+		String filename = genNewFileName();
+		recorder.setOutputFilename(filename);
 
-	/**
-	 * Create all GStreamer stuff for playing
-	 */
-	private void createPlayer() {
-		player = new PlayBin2("player");
-	}
-
-	public String recording(Action action) {
-		String filename = null;
-
-		if (action == Action.STOP) {
-			System.out.println("stop recording");
-
-			recorder.setState(State.NULL);
-		} else if (action == Action.START) {
-			System.out.println("start recording");
-
-			filename = genNewFileName();
-			recorder.getElementByName("filesink").set("location", filename);
-
-			recorder.setState(State.PLAYING);
-		}
+		recorder.play();
 
 		return filename;
+	}
+
+	/**
+	 * Stops the recording
+	 */
+	public void stopRecording() {
+		System.out.println("stop recording");
+
+		recorder.stop();
 	}
 
 	/**
@@ -81,7 +56,7 @@ public class App {
 	 * @param file
 	 *            filename
 	 */
-	public void play(String file) {
+	public void startPlayer(String file) {
 		System.out.println("playing " + file);
 
 		if (isPlaying()) {
@@ -90,6 +65,13 @@ public class App {
 
 		this.player.setInputFile(new File(file));
 		this.player.play();
+	}
+
+	/**
+	 * Pauses the player.
+	 */
+	public void pausePlayer() {
+		this.player.pause();
 	}
 
 	/**
@@ -102,16 +84,23 @@ public class App {
 	}
 
 	/**
-	 * Are we currently recording?
+	 * Is the recorder recording?
 	 */
 	public boolean isRecording() {
 		return (recorder.getState() == State.PLAYING);
 	}
 
 	/**
-	 * Are we currently recording?
+	 * Is the player playing?
 	 */
 	public boolean isPlaying() {
 		return (player.getState() == State.PLAYING);
+	}
+
+	/**
+	 * Is the player paused?
+	 */
+	public boolean playerIsPaused() {
+		return (player.getState() == State.PAUSED);
 	}
 }

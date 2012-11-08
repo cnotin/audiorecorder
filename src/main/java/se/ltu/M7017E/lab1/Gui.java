@@ -26,8 +26,6 @@ import javax.swing.event.ListSelectionListener;
 import org.gstreamer.Format;
 import org.gstreamer.swing.PipelinePositionModel;
 
-import se.ltu.M7017E.lab1.App.Action;
-
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
@@ -36,6 +34,8 @@ public class Gui extends JFrame {
 	private JSlider slider;
 	private JLabel timeLbl;
 	private JList filesLst;
+	private JButton recBtn;
+	private JButton playBtn;
 	private String selection; // file selected for play
 	private DefaultListModel filesLstModel;
 	private PipelinePositionModel playerPositionModel;
@@ -171,7 +171,7 @@ public class Gui extends JFrame {
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 
-		JButton recBtn = new JButton("REC");
+		recBtn = new JButton("REC");
 		recBtn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -181,10 +181,12 @@ public class Gui extends JFrame {
 
 				if (app.isRecording()) {
 					// stop recording
-					app.recording(Action.STOP);
+					app.stopRecording();
+					recBtn.setText("REC");
 				} else {
 					// start recording and add filename to list of files
-					filesLstModel.addElement(app.recording(Action.START));
+					recBtn.setText("STOP");
+					filesLstModel.addElement(app.startRecording());
 				}
 			}
 
@@ -210,15 +212,21 @@ public class Gui extends JFrame {
 		});
 		buttons.add(recBtn);
 
-		JButton play=new JButton("PLAY");
-		play.addMouseListener(new MouseListener() {
+		playBtn = new JButton("PLAY");
+		playBtn.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("play " + selection);
 
-				slider.setModel(playerPositionModel);
+				if (!app.isPlaying()){
+					slider.setModel(playerPositionModel);
+					app.startPlayer(selection);
+					playBtn.setText("PAUSE");
+				}else{
+					app.pausePlayer();
+					playBtn.setText("PLAY");
+				}
 
-				app.play(selection);
 			}
 
 			@Override
@@ -246,7 +254,7 @@ public class Gui extends JFrame {
 			}
 		});
 		
-		buttons.add(play);
+		buttons.add(playBtn);
 
 		return buttons;
 	}
