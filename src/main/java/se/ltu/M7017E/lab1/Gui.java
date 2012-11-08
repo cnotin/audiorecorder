@@ -8,6 +8,7 @@ import java.io.FileFilter;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,6 +41,15 @@ public class Gui extends JFrame {
 	private DefaultListModel filesLstModel;
 	private PipelinePositionModel playerPositionModel;
 	private PipelinePositionModel recorderPositionModel;
+	
+	private ImageIcon recordIcon = new ImageIcon(
+			"src/main/resources/icons/record.png");
+	private ImageIcon recordDisabledIcon = new ImageIcon(
+			"src/main/resources/icons/record_disabled.png");
+	private ImageIcon playIcon = new ImageIcon(
+			"src/main/resources/icons/play.png");
+	private ImageIcon pauseIcon = new ImageIcon(
+			"src/main/resources/icons/pause.png");
 
 	public Gui() {
 		// app holds the business logic of the app
@@ -169,7 +179,7 @@ public class Gui extends JFrame {
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 
-		recBtn = new JButton("REC");
+		recBtn = new JButton(recordIcon);
 		recBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -180,17 +190,17 @@ public class Gui extends JFrame {
 				if (app.isRecording()) {
 					// stop recording
 					app.stopRecording();
-					recBtn.setText("REC");
+					recBtn.setIcon(recordIcon);
 				} else {
 					// start recording and add filename to list of files
-					recBtn.setText("STOP");
+					recBtn.setIcon(recordDisabledIcon);
 					filesLstModel.addElement(app.startRecording());
 				}
 			}
 		});
 		buttons.add(recBtn);
 
-		playBtn = new JButton("PLAY");
+		playBtn = new JButton(playIcon);
 		playBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -200,10 +210,10 @@ public class Gui extends JFrame {
 				if (selection != null && !app.isPlaying()) {
 					slider.setModel(playerPositionModel);
 					app.startPlayer(selection);
-					playBtn.setText("PAUSE");
+					playBtn.setIcon(pauseIcon);
 				} else {
 					app.pausePlayer();
-					playBtn.setText("PLAY");
+					playBtn.setIcon(playIcon);
 				}
 			}
 		});
