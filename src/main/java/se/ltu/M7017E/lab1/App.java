@@ -14,7 +14,7 @@ public class App {
 	private Recorder recorder = new Recorder();
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
-	
+
 	/**
 	 * Date formatter for recording filenames
 	 */
@@ -56,14 +56,14 @@ public class App {
 	 * @param file
 	 *            filename
 	 */
-	public void startPlayer(String file) {
+	public void startPlayer(String file, Boolean alreadyStarted) {
 		System.out.println("playing " + file);
 
 		if (isPlaying()) {
 			player.stop();
 		}
-
-		this.player.setInputFile(new File(file));
+		if(alreadyStarted==false)
+			this.player.setInputFile(new File(file));
 		this.player.play();
 	}
 

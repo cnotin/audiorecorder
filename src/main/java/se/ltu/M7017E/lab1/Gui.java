@@ -182,7 +182,7 @@ public class Gui extends JFrame {
 					System.out.println(list.getSelectedValue());
 					selection = (String) filesLst.getSelectedValue();
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection);
+					app.startPlayer(selection,false);
 					playBtn.setIcon(pauseIcon);
 				}
 				
@@ -264,7 +264,16 @@ public class Gui extends JFrame {
 				// "selection" is null if file list is empty
 				if (selection != null && !app.isPlaying()) {
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection);
+					if(app.playerIsPaused()){
+						System.out.println("pause");
+						app.startPlayer(selection,true);				
+					}						
+					else
+					{
+						System.out.println("stop");
+						app.startPlayer(selection,false);
+					}
+						
 					playBtn.setIcon(pauseIcon);
 					
 					//we stop the player when the file is over
@@ -283,6 +292,7 @@ public class Gui extends JFrame {
 					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
+					
 				}
 			}
 		});
