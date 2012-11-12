@@ -21,10 +21,6 @@ public class App {
 	private SimpleDateFormat filenameFormatter = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ss");
 
-	public static enum Action {
-		START, STOP
-	};
-
 	/**
 	 * Starts the recording, automatically generating a new filename
 	 * 
