@@ -48,18 +48,19 @@ public class App {
 
 	/**
 	 * Play audio file from filename
-	 * 
+	 * i
 	 * @param file
 	 *            filename
 	 */
-	public void startPlayer(String file) {
+	public void startPlayer(String file, Boolean alreadyStarted) {
 		System.out.println("playing " + file);
 
 		if (isPlaying()) {
 			player.stop();
 		}
-
-		this.player.setInputFile(new File(file));
+		//if the file is already started (ie in pause) we do not need it
+		if(alreadyStarted==false)
+			this.player.setInputFile(new File(file));
 		this.player.play();
 	}
 
@@ -68,6 +69,10 @@ public class App {
 	 */
 	public void pausePlayer() {
 		this.player.pause();
+	}
+	
+	public void stopPlayer() {
+		this.player.stop();
 	}
 
 	/**

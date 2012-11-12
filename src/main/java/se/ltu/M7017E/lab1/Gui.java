@@ -3,6 +3,8 @@ package se.ltu.M7017E.lab1;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
 
@@ -24,7 +26,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.gstreamer.Bus;
 import org.gstreamer.Format;
+import org.gstreamer.Gst;
+import org.gstreamer.GstObject;
+import org.gstreamer.Pipeline;
 import org.gstreamer.swing.PipelinePositionModel;
 
 public class Gui extends JFrame {
@@ -92,11 +98,19 @@ public class Gui extends JFrame {
 	 * Formats it to a nice HH:MM:SS string.
 	 */
 	private void updateTimeLbl() {
-		long position = app.getRecorder().queryPosition(Format.TIME);
-		// 10^9, convert from nanoseconds to second
+		Pipeline playslider = new Pipeline();
+		if (app.isRecording())
+		{
+			playslider = app.getRecorder();
+		}
+		else if (app.isPlaying()){
+			playslider = app.getPlayer();
+		}
+		long position = playslider.queryPosition(Format.TIME);
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
+
 	}
 
 	private JPanel createSlider() {
@@ -161,7 +175,53 @@ public class Gui extends JFrame {
 
 			}
 		};
+		
+		//listener for playing a doubleclicked file in the JList
+		MouseListener  doubleClicklistener=new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				JList list= (JList)evt.getSource();
+				// TODO Auto-generated method stub
+				if(evt.getClickCount()==2)
+				{
+					System.out.println(list.getSelectedValue());
+					selection = (String) filesLst.getSelectedValue();
+					slider.setModel(playerPositionModel);
+					app.startPlayer(selection,false);
+					playBtn.setIcon(pauseIcon);
+				}
+				
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		};
 		this.filesLst.addListSelectionListener(listener);
+		this.filesLst.addMouseListener(doubleClicklistener);
 		return panel;
 	}
 
@@ -210,11 +270,35 @@ public class Gui extends JFrame {
 				// "selection" is null if file list is empty
 				if (selection != null && !app.isPlaying()) {
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection);
+					if(app.playerIsPaused()){
+						System.out.println("pause");
+						app.startPlayer(selection,true);				
+					}						
+					else
+					{
+						System.out.println("stop");
+						app.startPlayer(selection,false);
+					}
+						
 					playBtn.setIcon(pauseIcon);
-				} else {
+					
+					//we stop the player when the file is over
+					app.getPlayer().getBus().connect(new Bus.EOS() {
+
+			            public void endOfStream(GstObject source) {
+			                System.out.println("Finished playing file"); 
+			                Gst.quit();
+			                app.stopPlayer();
+			                playBtn.setIcon(playIcon);
+			                
+			            }
+			        });
+					
+				} else {				
+					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
+					
 				}
 			}
 		});
