@@ -14,7 +14,7 @@ public class App {
 	private Recorder recorder = new Recorder();
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
-
+	
 	/**
 	 * Date formatter for recording filenames
 	 */

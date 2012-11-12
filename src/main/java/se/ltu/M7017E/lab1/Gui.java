@@ -29,7 +29,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.gstreamer.Bus;
 import org.gstreamer.Format;
+import org.gstreamer.Gst;
+import org.gstreamer.GstObject;
 import org.gstreamer.swing.PipelinePositionModel;
 
 public class Gui extends JFrame {
@@ -263,6 +266,18 @@ public class Gui extends JFrame {
 					slider.setModel(playerPositionModel);
 					app.startPlayer(selection);
 					playBtn.setIcon(pauseIcon);
+					
+					//we stop the player when the file is over
+					app.getPlayer().getBus().connect(new Bus.EOS() {
+
+			            public void endOfStream(GstObject source) {
+			                System.out.println("Finished playing file"); 
+			                Gst.quit();
+			                app.stopPlayer();
+			                playBtn.setIcon(playIcon);
+			                
+			            }
+			        });
 					
 				} else {				
 					System.out.println(app.getPlayer().getState());
