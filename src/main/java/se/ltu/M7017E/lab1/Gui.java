@@ -25,6 +25,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.gstreamer.Format;
+import org.gstreamer.Pipeline;
+import org.gstreamer.elements.PlayBin2;
 import org.gstreamer.swing.PipelinePositionModel;
 
 public class Gui extends JFrame {
@@ -92,11 +94,19 @@ public class Gui extends JFrame {
 	 * Formats it to a nice HH:MM:SS string.
 	 */
 	private void updateTimeLbl() {
-		long position = app.getRecorder().queryPosition(Format.TIME);
-		// 10^9, convert from nanoseconds to second
+		Pipeline playslider = new Pipeline();
+		if (app.isRecording())
+		{
+			playslider = app.getRecorder();
+		}
+		else if (app.isPlaying()){
+			playslider = app.getPlayer();
+		}
+		long position = playslider.queryPosition(Format.TIME);
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
+
 	}
 
 	private JPanel createSlider() {
