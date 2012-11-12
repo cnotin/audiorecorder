@@ -52,7 +52,7 @@ public class App {
 
 	/**
 	 * Play audio file from filename
-	 * 
+	 * i
 	 * @param file
 	 *            filename
 	 */
@@ -62,6 +62,7 @@ public class App {
 		if (isPlaying()) {
 			player.stop();
 		}
+		//if the file is already started (ie in pause) we do not need it
 		if(alreadyStarted==false)
 			this.player.setInputFile(new File(file));
 		this.player.play();
