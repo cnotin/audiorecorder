@@ -64,6 +64,7 @@ public class Gui extends JFrame {
 		// use OS' native look'n'feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.put("Slider.paintValue", false);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
