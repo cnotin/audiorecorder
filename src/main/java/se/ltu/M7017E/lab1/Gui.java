@@ -3,8 +3,13 @@ package se.ltu.M7017E.lab1;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -96,6 +101,7 @@ public class Gui extends JFrame {
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
+		
 	}
 
 	private JPanel createSlider() {
@@ -160,7 +166,53 @@ public class Gui extends JFrame {
 
 			}
 		};
+		
+		//listener for playing a doubleclicked file in the JList
+		MouseListener  doubleClicklistener=new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				JList list= (JList)evt.getSource();
+				// TODO Auto-generated method stub
+				if(evt.getClickCount()==2)
+				{
+					System.out.println(list.getSelectedValue());
+					selection = (String) filesLst.getSelectedValue();
+					slider.setModel(playerPositionModel);
+					app.startPlayer(selection);
+					playBtn.setIcon(pauseIcon);
+				}
+				
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		};
 		this.filesLst.addListSelectionListener(listener);
+		this.filesLst.addMouseListener(doubleClicklistener);
 		return panel;
 	}
 
@@ -211,7 +263,9 @@ public class Gui extends JFrame {
 					slider.setModel(playerPositionModel);
 					app.startPlayer(selection);
 					playBtn.setIcon(pauseIcon);
-				} else {
+					
+				} else {				
+					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
 				}

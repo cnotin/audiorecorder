@@ -73,6 +73,10 @@ public class App {
 	public void pausePlayer() {
 		this.player.pause();
 	}
+	
+	public void stopPlayer() {
+		this.player.stop();
+	}
 
 	/**
 	 * Generate a filename for a new recording based on the date.
