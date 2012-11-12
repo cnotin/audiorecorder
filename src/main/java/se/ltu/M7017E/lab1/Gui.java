@@ -7,9 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -33,6 +30,7 @@ import org.gstreamer.Bus;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
+import org.gstreamer.Pipeline;
 import org.gstreamer.swing.PipelinePositionModel;
 
 public class Gui extends JFrame {
@@ -72,6 +70,7 @@ public class Gui extends JFrame {
 		// use OS' native look'n'feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.put("Slider.paintValue", false);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,12 +98,19 @@ public class Gui extends JFrame {
 	 * Formats it to a nice HH:MM:SS string.
 	 */
 	private void updateTimeLbl() {
-		long position = app.getRecorder().queryPosition(Format.TIME);
-		// 10^9, convert from nanoseconds to second
+		Pipeline playslider = new Pipeline();
+		if (app.isRecording())
+		{
+			playslider = app.getRecorder();
+		}
+		else if (app.isPlaying()){
+			playslider = app.getPlayer();
+		}
+		long position = playslider.queryPosition(Format.TIME);
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
-		
+
 	}
 
 	private JPanel createSlider() {
