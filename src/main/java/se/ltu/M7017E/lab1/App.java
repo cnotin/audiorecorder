@@ -52,15 +52,14 @@ public class App {
 	 * @param file
 	 *            filename
 	 */
-	public void startPlayer(String file, Boolean alreadyStarted) {
+	public void startPlayer(String file) {
 		System.out.println("playing " + file);
 
 		if (isPlaying()) {
 			player.stop();
 		}
-		//if the file is already started (ie in pause) we do not need it
-		if(alreadyStarted==false)
-			this.player.setInputFile(new File(file));
+
+		this.player.setInputFile(new File(file));
 		this.player.play();
 	}
 

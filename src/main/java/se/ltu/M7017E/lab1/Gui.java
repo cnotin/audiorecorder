@@ -188,7 +188,7 @@ public class Gui extends JFrame {
 							.getSelectedValue());
 					selection = (String) filesLst.getSelectedValue();
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection, false);
+					app.startPlayer(selection);
 					playBtn.setIcon(pauseIcon);
 				}
 			}
@@ -244,10 +244,10 @@ public class Gui extends JFrame {
 					slider.setModel(playerPositionModel);
 					if (app.playerIsPaused()) {
 						System.out.println("pause");
-						app.startPlayer(selection, true);
+						app.startPlayer(selection);
 					} else {
 						System.out.println("stop");
-						app.startPlayer(selection, false);
+						app.startPlayer(selection);
 					}
 
 					playBtn.setIcon(pauseIcon);
