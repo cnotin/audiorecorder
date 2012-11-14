@@ -28,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 
 import org.gstreamer.Bus;
 import org.gstreamer.Format;
-import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.Pipeline;
 import org.gstreamer.swing.PipelinePositionModel;
@@ -91,6 +90,14 @@ public class Gui extends JFrame {
 		this.add(createControls());
 		this.add(createSlider());
 		this.add(createFilesList());
+
+		// EOS => change back the button to "play" action
+		app.getPlayer().getBus().connect(new Bus.EOS() {
+			public void endOfStream(GstObject source) {
+				System.out.println("Finished playing file");
+				playBtn.setIcon(playIcon);
+			}
+		});
 	}
 
 	/**
@@ -281,19 +288,6 @@ public class Gui extends JFrame {
 					}
 						
 					playBtn.setIcon(pauseIcon);
-					
-					//we stop the player when the file is over
-					app.getPlayer().getBus().connect(new Bus.EOS() {
-
-			            public void endOfStream(GstObject source) {
-			                System.out.println("Finished playing file"); 
-			                Gst.quit();
-			                app.stopPlayer();
-			                playBtn.setIcon(playIcon);
-			                
-			            }
-			        });
-					
 				} else {				
 					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
