@@ -156,8 +156,10 @@ public class Gui extends JFrame {
 
 		for (File file : oggFiles) {
 			this.filesLstModel.addElement(file.getName());
+			
 		}
 		this.filesLst = new JList(filesLstModel);
+		this.app.setList(filesLst);
 		JScrollPane scrollPane = new JScrollPane(this.filesLst);
 
 		panel.add(scrollPane);
@@ -190,6 +192,19 @@ public class Gui extends JFrame {
 					slider.setModel(playerPositionModel);
 					app.startPlayer(selection,false);
 					playBtn.setIcon(pauseIcon);
+					
+					//we stop the player when the file is over
+					app.getPlayer().getBus().connect(new Bus.EOS() {
+
+			            public void endOfStream(GstObject source) {
+			                System.out.println("Finished playing file"); 
+			                Gst.quit();
+			                app.stopPlayer();
+			                playBtn.setIcon(playIcon);
+			                
+			            }
+			        });
+					
 				}
 				
 				
@@ -311,9 +326,9 @@ public class Gui extends JFrame {
 	/**
 	 * File filter for OGG files
 	 */
-	private class OggFilter implements FileFilter {
+	public class OggFilter implements FileFilter {
 		public boolean accept(File file) {
-			return file.getName().endsWith("ogg");
+			return file.getName().endsWith(".ogg");
 		}
 	}
 }

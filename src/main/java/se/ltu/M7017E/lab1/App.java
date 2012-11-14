@@ -1,8 +1,14 @@
 package se.ltu.M7017E.lab1;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import lombok.Getter;
 
@@ -14,6 +20,9 @@ public class App {
 	private Recorder recorder = new Recorder();
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
+	private String filename;
+	private JList list; 
+	
 
 	/**
 	 * Date formatter for recording filenames
@@ -29,7 +38,7 @@ public class App {
 	public String startRecording() {
 		System.out.println("start recording");
 
-		String filename = genNewFileName();
+		this.filename = genNewFileName();
 		recorder.setOutputFilename(filename);
 
 		recorder.play();
@@ -42,7 +51,10 @@ public class App {
 	 */
 	public void stopRecording() {
 		System.out.println("stop recording");
-
+	
+		System.out.println(this.list);
+		NameChangeJDialog d = new NameChangeJDialog(this.filename,this.list);
+		
 		recorder.stop();
 	}
 
@@ -103,5 +115,9 @@ public class App {
 	 */
 	public boolean playerIsPaused() {
 		return (player.getState() == State.PAUSED);
+	}
+	
+	public void setList(JList list) {
+		this.list=list;
 	}
 }
