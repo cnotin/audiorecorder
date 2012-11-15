@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -26,10 +27,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.gstreamer.Bus;
 import org.gstreamer.Format;
-import org.gstreamer.Gst;
-import org.gstreamer.GstObject;
 import org.gstreamer.Pipeline;
 import org.gstreamer.swing.PipelinePositionModel;
 
@@ -47,7 +45,7 @@ public class Gui extends JFrame {
 	private DefaultListModel filesLstModel;
 	private PipelinePositionModel playerPositionModel;
 	private PipelinePositionModel recorderPositionModel;
-	
+
 	private ImageIcon recordIcon = new ImageIcon(
 			"src/main/resources/icons/record.png");
 	private ImageIcon recordDisabledIcon = new ImageIcon(
@@ -99,11 +97,9 @@ public class Gui extends JFrame {
 	 */
 	private void updateTimeLbl() {
 		Pipeline playslider = new Pipeline();
-		if (app.isRecording())
-		{
+		if (app.isRecording()) {
 			playslider = app.getRecorder();
-		}
-		else if (app.isPlaying()){
+		} else if (app.isPlaying()) {
 			playslider = app.getPlayer();
 		}
 		long position = playslider.queryPosition(Format.TIME);
@@ -156,84 +152,63 @@ public class Gui extends JFrame {
 
 		for (File file : oggFiles) {
 			this.filesLstModel.addElement(file.getName());
-			
+
 		}
 		this.filesLst = new JList(filesLstModel);
-		this.app.setList(filesLst);
 		JScrollPane scrollPane = new JScrollPane(this.filesLst);
 
 		panel.add(scrollPane);
 		panel.setPreferredSize(new Dimension(300, 400));
 		this.filesLst.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ListSelectionListener listener = new ListSelectionListener() {
-
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					selection = (String) filesLst.getSelectedValue();
 					System.out.println(selection);
 				}
-				// TODO Auto-generated method stub
-
 			}
 		};
-		
-		//listener for playing a doubleclicked file in the JList
-		MouseListener  doubleClicklistener=new MouseListener(){
 
+		// listener for playing a doubleclicked file in the JList
+		MouseListener doubleClicklistener = new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				JList list= (JList)evt.getSource();
-				// TODO Auto-generated method stub
-				if(evt.getClickCount()==2)
-				{
+				JList list = (JList) evt.getSource();
+				if (evt.getClickCount() == 2) {
 					System.out.println(list.getSelectedValue());
 					selection = (String) filesLst.getSelectedValue();
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection,false);
+					app.startPlayer(selection, false);
 					playBtn.setIcon(pauseIcon);
-					
-					//we stop the player when the file is over
-					app.getPlayer().getBus().connect(new Bus.EOS() {
-
-			            public void endOfStream(GstObject source) {
-			                System.out.println("Finished playing file"); 
-			                Gst.quit();
-			                app.stopPlayer();
-			                playBtn.setIcon(playIcon);
-			                
-			            }
-			        });
-					
 				}
-				
-				
+
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 		};
 		this.filesLst.addListSelectionListener(listener);
 		this.filesLst.addMouseListener(doubleClicklistener);
@@ -266,11 +241,17 @@ public class Gui extends JFrame {
 				if (app.isRecording()) {
 					// stop recording
 					app.stopRecording();
+
+					String filename = JOptionPane.showInputDialog(Gui.this,
+							"Please name your file", app.genNewFileName());
+					app.renameLastRecording(filename);
+
+					filesLstModel.addElement(filename);
 					recBtn.setIcon(recordIcon);
 				} else {
 					// start recording and add filename to list of files
 					recBtn.setIcon(recordDisabledIcon);
-					filesLstModel.addElement(app.startRecording());
+					app.startRecording();
 				}
 			}
 		});
@@ -285,35 +266,20 @@ public class Gui extends JFrame {
 				// "selection" is null if file list is empty
 				if (selection != null && !app.isPlaying()) {
 					slider.setModel(playerPositionModel);
-					if(app.playerIsPaused()){
+					if (app.playerIsPaused()) {
 						System.out.println("pause");
-						app.startPlayer(selection,true);				
-					}						
-					else
-					{
+						app.startPlayer(selection, true);
+					} else {
 						System.out.println("stop");
-						app.startPlayer(selection,false);
+						app.startPlayer(selection, false);
 					}
-						
-					playBtn.setIcon(pauseIcon);
-					
-					//we stop the player when the file is over
-					app.getPlayer().getBus().connect(new Bus.EOS() {
 
-			            public void endOfStream(GstObject source) {
-			                System.out.println("Finished playing file"); 
-			                Gst.quit();
-			                app.stopPlayer();
-			                playBtn.setIcon(playIcon);
-			                
-			            }
-			        });
-					
-				} else {				
+					playBtn.setIcon(pauseIcon);
+				} else {
 					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
-					
+
 				}
 			}
 		});

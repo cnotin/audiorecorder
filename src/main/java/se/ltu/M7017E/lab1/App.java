@@ -1,14 +1,8 @@
 package se.ltu.M7017E.lab1;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.swing.JDialog;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import lombok.Getter;
 
@@ -16,13 +10,12 @@ import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin2;
 
 public class App {
+	private static final String TEMP_RECORDING_FILE = "tmp.ogg";
+
 	@Getter
 	private Recorder recorder = new Recorder();
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
-	private String filename;
-	private JList list; 
-	
 
 	/**
 	 * Date formatter for recording filenames
@@ -30,37 +23,46 @@ public class App {
 	private SimpleDateFormat filenameFormatter = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ss");
 
+	public App() {
+		recorder.setOutputFilename(TEMP_RECORDING_FILE);
+	}
+
 	/**
 	 * Starts the recording, automatically generating a new filename
 	 * 
 	 * @return the generated filename, including extension
 	 */
-	public String startRecording() {
+	public void startRecording() {
 		System.out.println("start recording");
 
-		this.filename = genNewFileName();
-		recorder.setOutputFilename(filename);
-
 		recorder.play();
-
-		return filename;
 	}
 
 	/**
-	 * Stops the recording
+	 * Stops the recording. Must call {@link #renameLastRecording(String)} after
+	 * to change temp file name (otherwise the recording will be overwritten by
+	 * next one).
 	 */
 	public void stopRecording() {
 		System.out.println("stop recording");
-	
-		System.out.println(this.list);
-		NameChangeJDialog d = new NameChangeJDialog(this.filename,this.list);
-		
+
 		recorder.stop();
+	}
+
+/**
+	 * Rename last recording file. Usually called just after
+	 * {@link #stopRecording()
+	 * 
+	 * @param filename
+	 *            filename (extension, ie ".ogg", must be included)
+	 */
+	public void renameLastRecording(String filename) {
+		new File(TEMP_RECORDING_FILE).renameTo(new File(filename));
 	}
 
 	/**
 	 * Play audio file from filename
-	 * i
+	 * 
 	 * @param file
 	 *            filename
 	 */
@@ -70,8 +72,8 @@ public class App {
 		if (isPlaying()) {
 			player.stop();
 		}
-		//if the file is already started (ie in pause) we do not need it
-		if(alreadyStarted==false)
+		// if the file is already started (ie in pause) we do not need it
+		if (alreadyStarted == false)
 			this.player.setInputFile(new File(file));
 		this.player.play();
 	}
@@ -82,7 +84,7 @@ public class App {
 	public void pausePlayer() {
 		this.player.pause();
 	}
-	
+
 	public void stopPlayer() {
 		this.player.stop();
 	}
@@ -115,9 +117,5 @@ public class App {
 	 */
 	public boolean playerIsPaused() {
 		return (player.getState() == State.PAUSED);
-	}
-	
-	public void setList(JList list) {
-		this.list=list;
 	}
 }
