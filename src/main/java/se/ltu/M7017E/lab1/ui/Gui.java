@@ -210,9 +210,11 @@ public class Gui extends JFrame {
 				if (evt.getClickCount() == 2) {
 					System.out.println(((JList) evt.getSource())
 							.getSelectedValue());
+					app.stopPlayer();
+
 					selection = (String) filesLst.getSelectedValue();
 					slider.setModel(playerPositionModel);
-					app.startPlayer(selection);
+					app.startPlayer(selection + ".ogg");
 					playBtn.setIcon(pauseIcon);
 				}
 			}
@@ -236,7 +238,9 @@ public class Gui extends JFrame {
 		File[] oggFiles = currDir.listFiles(new OggFilter());
 
 		for (File file : oggFiles) {
-			this.filesLstModel.addElement(file.getName());
+			String name = file.getName();
+			// remove files' extension
+			this.filesLstModel.addElement(name.substring(0, name.length() - 4));
 
 		}
 		this.filesLst.setModel(filesLstModel);
@@ -269,8 +273,12 @@ public class Gui extends JFrame {
 					// stop recording
 					app.stopRecording();
 
+					String defaultFilename = app.genNewFileName();
 					String filename = JOptionPane.showInputDialog(Gui.this,
-							"Please name your file", app.genNewFileName());
+							"Please name your file", defaultFilename);
+					if (filename == null) {
+						filename = defaultFilename;
+					}
 					app.renameLastRecording(filename);
 
 					filesLstModel.addElement(filename);
@@ -295,10 +303,10 @@ public class Gui extends JFrame {
 					slider.setModel(playerPositionModel);
 					if (app.playerIsPaused()) {
 						System.out.println("pause");
-						app.startPlayer(selection);
+						app.startPlayer(selection + ".ogg");
 					} else {
 						System.out.println("stop");
-						app.startPlayer(selection);
+						app.pausePlayer();
 					}
 
 					playBtn.setIcon(pauseIcon);

@@ -58,9 +58,8 @@ public class App {
 	}
 
 	/**
-	 * Starts the recording, automatically generating a new filename
+	 * Starts the recording to the temp file
 	 * 
-	 * @return the generated filename, including extension
 	 */
 	public void startRecording() {
 		System.out.println("start recording");
@@ -87,9 +86,10 @@ public class App {
 	 * {@link #stopRecording()}
 	 * 
 	 * @param filename
-	 *            filename (extension, ie ".ogg", must be included)
+	 *            filename WITHOUT extension (ie ".ogg")
 	 */
 	public void renameLastRecording(String filename) {
+		filename = filename + ".ogg";
 		new File(settings.getRecordingFolder() + File.separator
 				+ TEMP_RECORDING_FILE).renameTo(new File(settings
 				.getRecordingFolder() + File.separator + filename));
@@ -127,10 +127,10 @@ public class App {
 	/**
 	 * Generate a filename for a new recording based on the date.
 	 * 
-	 * @return the filename, including extension
+	 * @return the filename, WITHOUT extension
 	 */
 	public String genNewFileName() {
-		return filenameFormatter.format(new Date()) + ".ogg";
+		return filenameFormatter.format(new Date());
 	}
 
 	/**

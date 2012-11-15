@@ -43,7 +43,6 @@ public class PreferencesDialog extends JDialog {
 		this.setTitle("Preferences");
 		this.setModal(true);
 
-		// this.setSize(300, 500);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);// center window on screen
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
