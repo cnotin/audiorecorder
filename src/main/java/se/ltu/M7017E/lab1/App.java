@@ -6,6 +6,8 @@ import java.util.Date;
 
 import lombok.Getter;
 
+import org.gstreamer.Bus;
+import org.gstreamer.GstObject;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin2;
 
@@ -16,6 +18,8 @@ public class App {
 	private Recorder recorder = new Recorder();
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
+	@Getter
+	private Settings settings = new Settings();
 
 	/**
 	 * Date formatter for recording filenames
@@ -24,7 +28,33 @@ public class App {
 			"yyyy-MM-dd-HH-mm-ss");
 
 	public App() {
-		recorder.setOutputFilename(TEMP_RECORDING_FILE);
+		// redirect error and warning messages to our logger
+		player.getBus().connect(new Bus.ERROR() {
+			@Override
+			public void errorMessage(GstObject source, int code, String message) {
+				logErrorMessages(code, message);
+			}
+		});
+		player.getBus().connect(new Bus.WARNING() {
+			@Override
+			public void warningMessage(GstObject source, int code,
+					String message) {
+				logErrorMessages(code, message);
+			}
+		});
+	}
+
+	/**
+	 * Log to the console the message from GStreamer (or another component...)
+	 * 
+	 * @param code
+	 *            message code
+	 * @param message
+	 *            message string
+	 */
+	private void logErrorMessages(int code, String message) {
+		System.err.println("Received msg code=" + code + " with message \""
+				+ message + "\"");
 	}
 
 	/**
@@ -35,6 +65,9 @@ public class App {
 	public void startRecording() {
 		System.out.println("start recording");
 
+		recorder.setOutputFilename(settings.getRecordingFolder()
+				+ File.separator + TEMP_RECORDING_FILE);
+		recorder.setQuality(settings.getQuality());
 		recorder.play();
 	}
 
@@ -49,15 +82,17 @@ public class App {
 		recorder.stop();
 	}
 
-/**
+	/**
 	 * Rename last recording file. Usually called just after
-	 * {@link #stopRecording()
+	 * {@link #stopRecording()}
 	 * 
 	 * @param filename
 	 *            filename (extension, ie ".ogg", must be included)
 	 */
 	public void renameLastRecording(String filename) {
-		new File(TEMP_RECORDING_FILE).renameTo(new File(filename));
+		new File(settings.getRecordingFolder() + File.separator
+				+ TEMP_RECORDING_FILE).renameTo(new File(settings
+				.getRecordingFolder() + File.separator + filename));
 	}
 
 	/**
@@ -73,7 +108,8 @@ public class App {
 			player.stop();
 		}
 
-		this.player.setInputFile(new File(file));
+		this.player.setInputFile(new File(settings.getRecordingFolder()
+				+ File.separator + file));
 		this.player.play();
 	}
 

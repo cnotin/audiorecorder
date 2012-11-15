@@ -15,6 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,6 +41,7 @@ public class Gui extends JFrame {
 
 	private App app;
 
+	private JMenuBar menu;
 	private JSlider slider;
 	private JLabel timeLbl;
 	private JList filesLst;
@@ -85,6 +89,8 @@ public class Gui extends JFrame {
 			e.printStackTrace();
 		}
 
+		this.setJMenuBar(createMenu());
+
 		this.getContentPane().setLayout(
 				new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 		this.add(createTime());
@@ -99,6 +105,31 @@ public class Gui extends JFrame {
 				playBtn.setIcon(playIcon);
 			}
 		});
+	}
+
+	private JMenuBar createMenu() {
+		this.menu = new JMenuBar();
+
+		JMenu edit = new JMenu("Edit");
+		JMenuItem preferences = new JMenuItem("Preferences");
+		preferences.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("preferences");
+				new PreferencesDialog(Gui.this, app.getSettings())
+						.setVisible(true);
+			}
+		});
+		edit.add(preferences);
+		menu.add(edit);
+
+		JMenu help = new JMenu("?");
+		JMenuItem about = new JMenuItem("About");
+		// TODO about window
+		help.add(about);
+		menu.add(help);
+
+		return menu;
 	}
 
 	/**
@@ -153,18 +184,7 @@ public class Gui extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-		this.filesLstModel = new DefaultListModel();
-
-		// look in current directory for recording files
-		File currDir = new File(".");
-		// only ogg files
-		File[] oggFiles = currDir.listFiles(new OggFilter());
-
-		for (File file : oggFiles) {
-			this.filesLstModel.addElement(file.getName());
-
-		}
-		this.filesLst = new JList(filesLstModel);
+		this.filesLst = new JList();
 		JScrollPane scrollPane = new JScrollPane(this.filesLst);
 
 		panel.add(scrollPane);
@@ -196,7 +216,28 @@ public class Gui extends JFrame {
 			}
 		});
 
+		fillFileList();
+
 		return panel;
+	}
+
+	/**
+	 * Fill JList's model with all the files in the folder. Can be conveniently
+	 * called when needed to refresh it also!
+	 */
+	public void fillFileList() {
+		this.filesLstModel = new DefaultListModel();
+
+		// look in recording directory for recording files
+		File currDir = new File(app.getSettings().getRecordingFolder());
+		// only ogg files
+		File[] oggFiles = currDir.listFiles(new OggFilter());
+
+		for (File file : oggFiles) {
+			this.filesLstModel.addElement(file.getName());
+
+		}
+		this.filesLst.setModel(filesLstModel);
 	}
 
 	private JPanel createTime() {

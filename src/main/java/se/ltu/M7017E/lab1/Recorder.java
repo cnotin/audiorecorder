@@ -17,7 +17,6 @@ public class Recorder extends Pipeline {
 
 	public Recorder() {
 		super("recorder");
-		vorbisenc.set("bitrate", 64000L);
 
 		addMany(autoaudiosrc, vorbisenc, oggmux, filesink);
 		Pipeline.linkMany(autoaudiosrc, vorbisenc, oggmux, filesink);
@@ -31,5 +30,15 @@ public class Recorder extends Pipeline {
 	 */
 	public void setOutputFilename(String filename) {
 		filesink.set("location", filename);
+	}
+
+	/**
+	 * Sets quality for vorbis encoder.
+	 * 
+	 * @param quality
+	 *            from 0.1 (lowest) to 1 (highest)
+	 */
+	public void setQuality(float quality) {
+		vorbisenc.set("quality", quality);
 	}
 }
