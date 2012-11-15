@@ -277,10 +277,14 @@ public class Gui extends JFrame {
 							"Please name your file", defaultFilename);
 
 					if (filename == null) {
+						// user pressed the cancel button
+
 						app.discardRecording(defaultFilename);
 						app.discardRecording("tmp.ogg");
 					} else {
 						if (filename.equals("")) {
+							// filename is blank but user clicked OK? Let's use
+							// the default filename
 							filename = defaultFilename;
 						}
 						app.renameLastRecording(filename);
