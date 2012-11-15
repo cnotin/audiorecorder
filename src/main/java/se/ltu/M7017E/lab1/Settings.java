@@ -31,7 +31,7 @@ public class Settings {
 	 * @return the quality if set or the default
 	 */
 	public float getQuality() {
-		return prefs.getFloat("quality", 0.3f);
+		return prefs.getFloat("quality", 0.6f);
 	}
 
 	/**
