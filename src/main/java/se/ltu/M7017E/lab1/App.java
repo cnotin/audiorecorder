@@ -62,8 +62,6 @@ public class App {
 	 * 
 	 */
 	public void startRecording() {
-		System.out.println("start recording");
-
 		recorder.setOutputFilename(settings.getRecordingFolder()
 				+ File.separator + TEMP_RECORDING_FILE);
 		recorder.setQuality(settings.getQuality());
@@ -76,8 +74,6 @@ public class App {
 	 * next one).
 	 */
 	public void stopRecording() {
-		System.out.println("stop recording");
-
 		recorder.stop();
 	}
 
@@ -102,8 +98,6 @@ public class App {
 	 *            filename
 	 */
 	public void startPlayer(String file) {
-		System.out.println("playing " + file);
-
 		if (isPlaying()) {
 			player.stop();
 		}

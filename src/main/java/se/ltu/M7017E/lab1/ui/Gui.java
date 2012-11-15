@@ -80,16 +80,12 @@ public class Gui extends JFrame {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			UIManager.put("Slider.paintValue", false);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -105,7 +101,6 @@ public class Gui extends JFrame {
 		// EOS => change back the button to "play" action
 		app.getPlayer().getBus().connect(new Bus.EOS() {
 			public void endOfStream(GstObject source) {
-				System.out.println("Finished playing file");
 				playBtn.setIcon(playIcon);
 			}
 		});
@@ -119,7 +114,6 @@ public class Gui extends JFrame {
 		preferences.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("preferences");
 				new PreferencesDialog(Gui.this, app.getSettings())
 						.setVisible(true);
 			}
@@ -183,12 +177,6 @@ public class Gui extends JFrame {
 				updateTimeLbl();
 			}
 		});
-		// TODO convertir les labels en HH:mm:ss
-		// Hashtable labelTable = new Hashtable();
-		// labelTable.put(new Integer(0), new JLabel("Stop"));
-		// labelTable.put(new Integer(FPS_MAX / 10), new JLabel("Slow"));
-		// labelTable.put(new Integer(FPS_MAX), new JLabel("Fast"));
-
 		panel.add(slider);
 
 		return panel;
@@ -211,7 +199,6 @@ public class Gui extends JFrame {
 					selection = (String) filesLst.getSelectedValue();
 					app.stopPlayer();
 					playBtn.setIcon(playIcon);
-					System.out.println(selection);
 				}
 			}
 		};
@@ -222,8 +209,6 @@ public class Gui extends JFrame {
 		this.filesLst.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
 				if (evt.getClickCount() == 2) {
-					System.out.println(((JList) evt.getSource())
-							.getSelectedValue());
 					app.stopPlayer();
 
 					selection = (String) filesLst.getSelectedValue();
@@ -279,8 +264,6 @@ public class Gui extends JFrame {
 		recBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("record click");
-
 				slider.setModel(recorderPositionModel);
 
 				if (app.isRecording()) {
@@ -310,14 +293,11 @@ public class Gui extends JFrame {
 		playBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("play " + selection);
-
 				// "selection" is null if file list is empty
 				if (selection == null) {
 					return;
 				}
 				if (app.isPlaying()) {
-					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
 				} else {

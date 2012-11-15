@@ -15,6 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import se.ltu.M7017E.lab1.Settings;
 
 public class PreferencesDialog extends JDialog {
@@ -24,7 +27,6 @@ public class PreferencesDialog extends JDialog {
 	private JTextField dirPath = new JTextField(15);
 	private JButton browse = new JButton("Browse");
 	private JLabel qualityLbl = new JLabel("Quality");
-	// TODO change widget for a dropdown
 	private JComboBox quality = new JComboBox();
 	private JButton save = new JButton("Save");
 	private JButton cancel = new JButton("Cancel");
@@ -136,6 +138,14 @@ public class PreferencesDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Find the index of the previously saved quality value in the JListModel to
+	 * select it.
+	 * 
+	 * @param value
+	 *            quality setting value
+	 * @return the index from 0 to (size-1) or (-1) if not found
+	 */
 	private int findComboItemIndexByValue(float value) {
 		int index = 0;
 		for (QualityComboItem item : qualities) {
@@ -146,5 +156,23 @@ public class PreferencesDialog extends JDialog {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * Stolen from http://stackoverflow.com/a/5661669 because I wanted "Is it
+	 * possible to set a value and a label to a JComboBox so I can show a label
+	 * but get a value that is different?"
+	 */
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	private static class QualityComboItem {
+		private float value;
+		private String label;
+
+		@Override
+		public String toString() {
+			return label;
+		}
 	}
 }
