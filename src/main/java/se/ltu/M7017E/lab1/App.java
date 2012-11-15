@@ -94,6 +94,16 @@ public class App {
 				+ TEMP_RECORDING_FILE).renameTo(new File(settings
 				.getRecordingFolder() + File.separator + filename));
 	}
+	/**
+	 * Suppress a file
+	 * 
+	 * @param file
+	 *            filename
+	 */
+	public void discardRecording(String filename){
+		File file= new File(filename);
+		file.delete();
+	}
 
 	/**
 	 * Play audio file from filename
