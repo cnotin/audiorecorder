@@ -62,6 +62,8 @@ public class Gui extends JFrame {
 			"/icons/play.png"));
 	private ImageIcon pauseIcon = new ImageIcon(getClass().getResource(
 			"/icons/pause.png"));
+	private ImageIcon franceIcon = new ImageIcon(getClass().getResource(
+			"/icons/france.png"));
 
 	public Gui() {
 		// app holds the business logic of the app
@@ -127,8 +129,18 @@ public class Gui extends JFrame {
 
 		JMenu help = new JMenu("?");
 		JMenuItem about = new JMenuItem("About");
-		// TODO about window
+		about.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(Gui.this,
+						"This is a wonderful AudioRecorder, really.\nMade by: THE FRENCHIES!\n\n"
+								+ "· Flore Diallo\n" + "· Hervé Loeffel\n"
+								+ "· Clément Notin", null,
+						JOptionPane.INFORMATION_MESSAGE, franceIcon);
+			}
+		});
 		help.add(about);
+
 		menu.add(help);
 
 		return menu;
