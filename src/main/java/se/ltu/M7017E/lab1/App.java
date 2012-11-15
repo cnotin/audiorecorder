@@ -10,6 +10,8 @@ import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin2;
 
 public class App {
+	private static final String TEMP_RECORDING_FILE = "tmp.ogg";
+
 	@Getter
 	private Recorder recorder = new Recorder();
 	@Getter
@@ -21,24 +23,25 @@ public class App {
 	private SimpleDateFormat filenameFormatter = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ss");
 
+	public App() {
+		recorder.setOutputFilename(TEMP_RECORDING_FILE);
+	}
+
 	/**
 	 * Starts the recording, automatically generating a new filename
 	 * 
 	 * @return the generated filename, including extension
 	 */
-	public String startRecording() {
+	public void startRecording() {
 		System.out.println("start recording");
 
-		String filename = genNewFileName();
-		recorder.setOutputFilename(filename);
-
 		recorder.play();
-
-		return filename;
 	}
 
 	/**
-	 * Stops the recording
+	 * Stops the recording. Must call {@link #renameLastRecording(String)} after
+	 * to change temp file name (otherwise the recording will be overwritten by
+	 * next one).
 	 */
 	public void stopRecording() {
 		System.out.println("stop recording");
@@ -46,9 +49,20 @@ public class App {
 		recorder.stop();
 	}
 
+/**
+	 * Rename last recording file. Usually called just after
+	 * {@link #stopRecording()
+	 * 
+	 * @param filename
+	 *            filename (extension, ie ".ogg", must be included)
+	 */
+	public void renameLastRecording(String filename) {
+		new File(TEMP_RECORDING_FILE).renameTo(new File(filename));
+	}
+
 	/**
 	 * Play audio file from filename
-	 * i
+	 * 
 	 * @param file
 	 *            filename
 	 */
@@ -69,7 +83,7 @@ public class App {
 	public void pausePlayer() {
 		this.player.pause();
 	}
-	
+
 	public void stopPlayer() {
 		this.player.stop();
 	}

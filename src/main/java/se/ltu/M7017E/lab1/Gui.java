@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -161,6 +162,7 @@ public class Gui extends JFrame {
 
 		for (File file : oggFiles) {
 			this.filesLstModel.addElement(file.getName());
+
 		}
 		this.filesLst = new JList(filesLstModel);
 		JScrollPane scrollPane = new JScrollPane(this.filesLst);
@@ -223,11 +225,17 @@ public class Gui extends JFrame {
 				if (app.isRecording()) {
 					// stop recording
 					app.stopRecording();
+
+					String filename = JOptionPane.showInputDialog(Gui.this,
+							"Please name your file", app.genNewFileName());
+					app.renameLastRecording(filename);
+
+					filesLstModel.addElement(filename);
 					recBtn.setIcon(recordIcon);
 				} else {
 					// start recording and add filename to list of files
 					recBtn.setIcon(recordDisabledIcon);
-					filesLstModel.addElement(app.startRecording());
+					app.startRecording();
 				}
 			}
 		});
@@ -268,9 +276,9 @@ public class Gui extends JFrame {
 	/**
 	 * File filter for OGG files
 	 */
-	private class OggFilter implements FileFilter {
+	public class OggFilter implements FileFilter {
 		public boolean accept(File file) {
-			return file.getName().endsWith("ogg");
+			return file.getName().endsWith(".ogg");
 		}
 	}
 }
