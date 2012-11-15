@@ -1,6 +1,7 @@
 package se.ltu.M7017E.lab1.ui;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -63,12 +64,15 @@ public class Gui extends JFrame {
 	private ImageIcon pauseIcon = new ImageIcon(getClass().getResource(
 			"/icons/pause.png"));
 	private ImageIcon franceIcon = new ImageIcon(getClass().getResource(
-			"/icons/france.png"));
+			"/icons/appIcon.png"));
 
 	public Gui(final App app) {
 		// app holds the business logic of the app
 		this.app = app;
+
 		this.setTitle("Audio Recorder");
+		this.setIconImage(Toolkit.getDefaultToolkit().getImage(
+				getClass().getResource("/icons/appIcon.png")));
 
 		this.setSize(300, 500);
 		this.setResizable(false);
