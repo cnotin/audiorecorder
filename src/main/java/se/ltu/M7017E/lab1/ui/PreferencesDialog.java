@@ -65,6 +65,7 @@ public class PreferencesDialog extends JDialog {
 		this.add(cancel);
 		this.add(save);
 
+		this.getRootPane().setDefaultButton(save);
 		this.getContentPane().setLayout(new SpringLayout());
 		SpringUtilities
 				.makeCompactGrid(this.getContentPane(), 3, 2, 6, 6, 6, 6);
