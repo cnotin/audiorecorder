@@ -209,6 +209,8 @@ public class Gui extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					selection = (String) filesLst.getSelectedValue();
+					app.stopPlayer();
+					playBtn.setIcon(playIcon);
 					System.out.println(selection);
 				}
 			}
@@ -311,22 +313,17 @@ public class Gui extends JFrame {
 				System.out.println("play " + selection);
 
 				// "selection" is null if file list is empty
-				if (selection != null && !app.isPlaying()) {
-					slider.setModel(playerPositionModel);
-					if (app.playerIsPaused()) {
-						System.out.println("pause");
-						app.startPlayer(selection + ".ogg");
-					} else {
-						System.out.println("stop");
-						app.pausePlayer();
-					}
-
-					playBtn.setIcon(pauseIcon);
-				} else {
+				if (selection == null) {
+					return;
+				}
+				if (app.isPlaying()) {
 					System.out.println(app.getPlayer().getState());
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);
-
+				} else {
+					slider.setModel(playerPositionModel);
+					app.startPlayer(selection + ".ogg");
+					playBtn.setIcon(pauseIcon);
 				}
 			}
 		});
