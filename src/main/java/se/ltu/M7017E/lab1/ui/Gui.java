@@ -1,4 +1,4 @@
-package se.ltu.M7017E.lab1;
+package se.ltu.M7017E.lab1.ui;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -36,6 +36,8 @@ import org.gstreamer.GstObject;
 import org.gstreamer.Pipeline;
 import org.gstreamer.swing.PipelinePositionModel;
 
+import se.ltu.M7017E.lab1.App;
+
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
@@ -52,14 +54,14 @@ public class Gui extends JFrame {
 	private PipelinePositionModel playerPositionModel;
 	private PipelinePositionModel recorderPositionModel;
 
-	private ImageIcon recordIcon = new ImageIcon(
-			"src/main/resources/icons/record.png");
-	private ImageIcon recordDisabledIcon = new ImageIcon(
-			"src/main/resources/icons/record_disabled.png");
-	private ImageIcon playIcon = new ImageIcon(
-			"src/main/resources/icons/play.png");
-	private ImageIcon pauseIcon = new ImageIcon(
-			"src/main/resources/icons/pause.png");
+	private ImageIcon recordIcon = new ImageIcon(getClass().getResource(
+			"/icons/record.png"));
+	private ImageIcon recordDisabledIcon = new ImageIcon(getClass()
+			.getResource("/icons/record_disabled.png"));
+	private ImageIcon playIcon = new ImageIcon(getClass().getResource(
+			"/icons/play.png"));
+	private ImageIcon pauseIcon = new ImageIcon(getClass().getResource(
+			"/icons/pause.png"));
 
 	public Gui() {
 		// app holds the business logic of the app

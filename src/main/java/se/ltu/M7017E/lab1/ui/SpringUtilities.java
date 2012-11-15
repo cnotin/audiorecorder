@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package se.ltu.M7017E.lab1;
+package se.ltu.M7017E.lab1.ui;
 
 import javax.swing.*;
 import javax.swing.SpringLayout;

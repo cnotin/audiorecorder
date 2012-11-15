@@ -1,4 +1,4 @@
-package se.ltu.M7017E.lab1;
+package se.ltu.M7017E.lab1.ui;
 
 /**
  * Stolen from http://stackoverflow.com/a/5661669 because I wanted "Is it

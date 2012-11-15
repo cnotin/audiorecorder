@@ -1,4 +1,4 @@
-package se.ltu.M7017E.lab1;
+package se.ltu.M7017E.lab1.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+
+import se.ltu.M7017E.lab1.Settings;
 
 public class PreferencesDialog extends JDialog {
 	private static final long serialVersionUID = -3904501838573517158L;

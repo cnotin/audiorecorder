@@ -47,7 +47,18 @@ public class Settings {
 	 * @return the path if set or the default
 	 */
 	public String getRecordingFolder() {
-		return prefs.get("recordingFolder", new File("").getAbsolutePath());
+		String path = prefs.get("recordingFolder",
+				new File("").getAbsolutePath());
+		/*
+		 * when the configured folder (from a previous run for example) has been
+		 * deleted in the mean time, we should revert to the default instead
+		 */
+		if (!new File(path).isDirectory()) {
+			System.err
+					.println("The configured recording folder has been deleted, reverting to default.");
+			path = new File("").getAbsolutePath();
+		}
+		return path;
 	}
 
 	/**
