@@ -80,7 +80,7 @@ public class Settings {
 		try {
 			prefs.clear();
 		} catch (BackingStoreException e) {
-			System.out.println("Got a problem while retrieving preferences");
+			System.err.println("Got a problem while retrieving preferences");
 			e.printStackTrace();
 		}
 	}
@@ -89,7 +89,7 @@ public class Settings {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			System.out.println("Got a problem while flushing preferences");
+			System.err.println("Got a problem while flushing preferences");
 			e.printStackTrace();
 		}
 	}
