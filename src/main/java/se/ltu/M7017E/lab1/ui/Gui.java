@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FilenameFilter;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -65,9 +65,9 @@ public class Gui extends JFrame {
 	private ImageIcon franceIcon = new ImageIcon(getClass().getResource(
 			"/icons/france.png"));
 
-	public Gui() {
+	public Gui(final App app) {
 		// app holds the business logic of the app
-		this.app = new App();
+		this.app = app;
 		this.setTitle("Audio Recorder");
 
 		this.setSize(300, 500);
@@ -152,6 +152,7 @@ public class Gui extends JFrame {
 			playslider = app.getPlayer();
 		}
 		long position = playslider.queryPosition(Format.TIME);
+		// 10^9, because queryPosition gives nanoseconds
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
@@ -314,11 +315,12 @@ public class Gui extends JFrame {
 	}
 
 	/**
-	 * File filter for OGG files
+	 * Filename filter for OGG files
 	 */
-	public class OggFilter implements FileFilter {
-		public boolean accept(File file) {
-			return file.getName().endsWith(".ogg");
+	public class OggFilter implements FilenameFilter {
+		@Override
+		public boolean accept(File file, String name) {
+			return name.endsWith(".ogg");
 		}
 	}
 }

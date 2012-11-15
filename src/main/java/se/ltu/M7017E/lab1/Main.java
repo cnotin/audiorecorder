@@ -12,9 +12,11 @@ public class Main {
 
 		args = Gst.init("Audio recorder", args);
 
+		final App app = new App();
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				Gui gui = new Gui();
+				Gui gui = new Gui(app);
 				gui.setVisible(true);
 			}
 		});
