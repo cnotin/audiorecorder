@@ -270,25 +270,23 @@ public class Gui extends JFrame {
 				if (app.isRecording()) {
 					// stop recording
 					app.stopRecording();
-					JOptionPane saveFile=new JOptionPane();
+
 					String defaultFilename = app.genNewFileName();
-					
-					String filename = saveFile.showInputDialog(Gui.this,
+
+					String filename = JOptionPane.showInputDialog(Gui.this,
 							"Please name your file", defaultFilename);
-					
-					if (filename==null){
+
+					if (filename == null) {
 						app.discardRecording(defaultFilename);
 						app.discardRecording("tmp.ogg");
-					}
-					else{
+					} else {
 						if (filename.equals("")) {
 							filename = defaultFilename;
 						}
-						app.renameLastRecording(filename);					
+						app.renameLastRecording(filename);
 						filesLstModel.addElement(filename);
 					}
-					
-					
+
 					recBtn.setIcon(recordIcon);
 				} else {
 					// start recording and add filename to list of files
