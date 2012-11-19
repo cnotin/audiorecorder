@@ -11,18 +11,35 @@ import org.gstreamer.GstObject;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin2;
 
+/**
+ * Main business class with the API used by the GUI.
+ */
 public class App {
+	/**
+	 * Name of the temp recording file.
+	 */
 	private static final String TEMP_RECORDING_FILE = "tmp.ogg";
 
+	/**
+	 * GStreamer stuff for recording
+	 */
 	@Getter
 	private Recorder recorder = new Recorder();
+
+	/**
+	 * GStreamer stuff for playing
+	 */
 	@Getter
 	private PlayBin2 player = new PlayBin2("player");
+
+	/**
+	 * Settings utility-object
+	 */
 	@Getter
 	private Settings settings = new Settings();
 
 	/**
-	 * Date formatter for recording filenames
+	 * Date formatter for default recording filenames
 	 */
 	private SimpleDateFormat filenameFormatter = new SimpleDateFormat(
 			"yyyy-MM-dd-HH-mm-ss");
@@ -62,7 +79,7 @@ public class App {
 	 * 
 	 */
 	public void startRecording() {
-		recorder.setOutputFilename(settings.getRecordingFolder()
+		recorder.setOutputFile(settings.getRecordingFolder()
 				+ File.separator + TEMP_RECORDING_FILE);
 		recorder.setQuality(settings.getQuality());
 		recorder.play();
@@ -90,22 +107,20 @@ public class App {
 				+ TEMP_RECORDING_FILE).renameTo(new File(settings
 				.getRecordingFolder() + File.separator + filename));
 	}
+
 	/**
-	 * Suppress a file
-	 * 
-	 * @param file
-	 *            filename
+	 * Discard the current recording (finally the use doesn't want it...)
 	 */
-	public void discardRecording(String filename){
-		File file= new File(filename);
-		file.delete();
+	public void discardRecording() {
+		new File(TEMP_RECORDING_FILE).delete();
 	}
 
 	/**
 	 * Play audio file from filename
 	 * 
 	 * @param file
-	 *            filename
+	 *            filename, with extension and without the path (it's relative
+	 *            to the recording folder)
 	 */
 	public void startPlayer(String file) {
 		if (isPlaying()) {
@@ -124,6 +139,9 @@ public class App {
 		this.player.pause();
 	}
 
+	/**
+	 * Stops player.
+	 */
 	public void stopPlayer() {
 		this.player.stop();
 	}

@@ -20,10 +20,14 @@ import lombok.Getter;
 import lombok.Setter;
 import se.ltu.M7017E.lab1.Settings;
 
+/**
+ * Preferences window
+ */
 public class PreferencesDialog extends JDialog {
 	private static final long serialVersionUID = -3904501838573517158L;
 
 	private JLabel dirLbl = new JLabel("Recordings directory");
+	// 15 = preferred width, not a limit
 	private JTextField dirPath = new JTextField(15);
 	private JButton browse = new JButton("Browse");
 	private JLabel qualityLbl = new JLabel("Quality");
@@ -32,8 +36,14 @@ public class PreferencesDialog extends JDialog {
 	private JButton cancel = new JButton("Cancel");
 	private JFileChooser filechooser = new JFileChooser();
 
+	/**
+	 * The API for this window
+	 */
 	private final Settings settings;
 
+	/**
+	 * Available qualities to choose in the dropdown.
+	 */
 	public static final QualityComboItem[] qualities = {
 			new QualityComboItem(0.1f, "Lowest (~60 kbps)"),
 			new QualityComboItem(0.6f, "Medium (~110 kbps)"),
@@ -49,7 +59,6 @@ public class PreferencesDialog extends JDialog {
 		this.setLocationRelativeTo(null);// center window on screen
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-		this.setLayout(new SpringLayout());
 		this.add(dirLbl);
 		dirLbl.setLabelFor(dirPath);
 
@@ -65,7 +74,10 @@ public class PreferencesDialog extends JDialog {
 		this.add(cancel);
 		this.add(save);
 
+		// button to call when 'enter' is pressed
 		this.getRootPane().setDefaultButton(save);
+
+		// good layout for forms
 		this.getContentPane().setLayout(new SpringLayout());
 		SpringUtilities
 				.makeCompactGrid(this.getContentPane(), 3, 2, 6, 6, 6, 6);
@@ -99,6 +111,7 @@ public class PreferencesDialog extends JDialog {
 		cancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// destroy window, don't do anything else
 				dispose();
 			}
 		});
@@ -106,7 +119,7 @@ public class PreferencesDialog extends JDialog {
 		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (saveSettings()) {
+				if (saveSettings()) { // try to save (true if valid settings)
 					gui.fillFileList();
 					dispose();
 				}
@@ -160,9 +173,9 @@ public class PreferencesDialog extends JDialog {
 	}
 
 	/**
-	 * Stolen from http://stackoverflow.com/a/5661669 because I wanted "Is it
-	 * possible to set a value and a label to a JComboBox so I can show a label
-	 * but get a value that is different?"
+	 * Idea stolen from http://stackoverflow.com/a/5661669 because I wanted "Is
+	 * it possible to set a value and a label to a JComboBox so I can show a
+	 * label but get a value that is different?"
 	 */
 	@Getter
 	@Setter

@@ -14,6 +14,7 @@ public class Main {
 
 		final App app = new App();
 
+		// launch the GUI in the Swing event loop (best practice)
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Gui gui = new Gui(app);

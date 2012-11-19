@@ -39,22 +39,27 @@ import org.gstreamer.swing.PipelinePositionModel;
 
 import se.ltu.M7017E.lab1.App;
 
+/**
+ * Main window for the app.
+ */
 public class Gui extends JFrame {
 	private static final long serialVersionUID = 4170395611124108634L;
 
 	private App app;
 
+	// UI elements for easy access (in event handlers e.g.)
 	private JMenuBar menu;
 	private JSlider slider;
 	private JLabel timeLbl;
 	private JList filesLst;
 	private JButton recBtn;
-	private JButton playBtn;
+	private JButton playBtn; // is also the pause button
 	private String selection; // file selected for play
 	private DefaultListModel filesLstModel;
 	private PipelinePositionModel playerPositionModel;
 	private PipelinePositionModel recorderPositionModel;
 
+	// icons
 	private ImageIcon recordIcon = new ImageIcon(getClass().getResource(
 			"/icons/record.png"));
 	private ImageIcon recordDisabledIcon = new ImageIcon(getClass()
@@ -71,6 +76,7 @@ public class Gui extends JFrame {
 		this.app = app;
 
 		this.setTitle("Audio Recorder");
+		// app icon
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/icons/appIcon.png")));
 
@@ -84,12 +90,20 @@ public class Gui extends JFrame {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			UIManager.put("Slider.paintValue", false);
 		} catch (ClassNotFoundException e) {
+			System.err
+					.println("Got a problem while trying to use OS' native look'n'feel. Reverting to Swing default.");
 			e.printStackTrace();
 		} catch (InstantiationException e) {
+			System.err
+					.println("Got a problem while trying to use OS' native look'n'feel. Reverting to Swing default.");
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
+			System.err
+					.println("Got a problem while trying to use OS' native look'n'feel. Reverting to Swing default.");
 			e.printStackTrace();
 		} catch (UnsupportedLookAndFeelException e) {
+			System.err
+					.println("Got a problem while trying to use OS' native look'n'feel. Reverting to Swing default.");
 			e.printStackTrace();
 		}
 
@@ -102,7 +116,7 @@ public class Gui extends JFrame {
 		this.add(createSlider());
 		this.add(createFilesList());
 
-		// EOS => change back the button to "play" action
+		// End Of Stream => change back the button to "play" action
 		app.getPlayer().getBus().connect(new Bus.EOS() {
 			public void endOfStream(GstObject source) {
 				playBtn.setIcon(playIcon);
@@ -110,10 +124,16 @@ public class Gui extends JFrame {
 		});
 	}
 
+	/**
+	 * Create and fill the menus
+	 * 
+	 * @return the menu bar
+	 */
 	private JMenuBar createMenu() {
 		this.menu = new JMenuBar();
 
 		JMenu edit = new JMenu("Edit");
+		// preferences window
 		JMenuItem preferences = new JMenuItem("Preferences");
 		preferences.addActionListener(new ActionListener() {
 			@Override
@@ -126,6 +146,7 @@ public class Gui extends JFrame {
 		menu.add(edit);
 
 		JMenu help = new JMenu("?");
+		// about box
 		JMenuItem about = new JMenuItem("About");
 		about.addActionListener(new ActionListener() {
 			@Override
@@ -138,7 +159,6 @@ public class Gui extends JFrame {
 			}
 		});
 		help.add(about);
-
 		menu.add(help);
 
 		return menu;
@@ -149,20 +169,29 @@ public class Gui extends JFrame {
 	 * Formats it to a nice HH:MM:SS string.
 	 */
 	private void updateTimeLbl() {
+		/*
+		 * it links the slider to the recording or the playing pipeline
+		 * depending on the current state of the app
+		 */
 		Pipeline playslider = new Pipeline();
 		if (app.isRecording()) {
 			playslider = app.getRecorder();
 		} else if (app.isPlaying()) {
 			playslider = app.getPlayer();
 		}
+
 		long position = playslider.queryPosition(Format.TIME);
 		// 10^9, because queryPosition gives nanoseconds
 		position = position / 1000000000L;
 		timeLbl.setText(String.format("%d:%02d:%02d", position / 3600,
 				(position % 3600) / 60, position % 60));
-
 	}
 
+	/**
+	 * Create and setup the slider to view and seek a position in the file.
+	 * 
+	 * @return the JPanel containing the slider
+	 */
 	private JPanel createSlider() {
 		JPanel panel = new JPanel();
 
@@ -174,21 +203,32 @@ public class Gui extends JFrame {
 		playerPositionModel = new PipelinePositionModel(app.getPlayer());
 		recorderPositionModel = new PipelinePositionModel(app.getRecorder());
 
-		slider.setModel(recorderPositionModel);
-
+		/*
+		 * the PipelinePositionModel automatically updates the slider (every
+		 * second). We hook on this change to also update our time label
+		 */
 		this.slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				updateTimeLbl();
 			}
 		});
+
 		panel.add(slider);
 
 		return panel;
 	}
 
+	/**
+	 * Create the file list (with the old recordings) in a scrollable panel, and
+	 * fill it with the existing files.
+	 * 
+	 * @return the scrollable JPanel with the filled list
+	 */
 	private JPanel createFilesList() {
 		JPanel panel = new JPanel();
+
+		// with this layout the JList takes all available space
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
 		this.filesLst = new JList();
@@ -196,19 +236,21 @@ public class Gui extends JFrame {
 
 		panel.add(scrollPane);
 		panel.setPreferredSize(new Dimension(300, 400));
+		// disable multi selection
 		this.filesLst.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		ListSelectionListener listener = new ListSelectionListener() {
+
+		this.filesLst.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
+				// "click" event
+				if (!e.getValueIsAdjusting()) { // a single click generates
+												// several calls, filter them
 					selection = (String) filesLst.getSelectedValue();
 					app.stopPlayer();
 					playBtn.setIcon(playIcon);
 				}
 			}
-		};
-
-		this.filesLst.addListSelectionListener(listener);
+		});
 
 		// listener for playing a doubleclicked file in the JList
 		this.filesLst.addMouseListener(new MouseAdapter() {
@@ -243,13 +285,18 @@ public class Gui extends JFrame {
 
 		for (File file : oggFiles) {
 			String name = file.getName();
-			// remove files' extension
+			// remove files' extension, user doesn't want to see them
 			this.filesLstModel.addElement(name.substring(0, name.length() - 4));
 
 		}
 		this.filesLst.setModel(filesLstModel);
 	}
 
+	/**
+	 * Create the timelabel to show the current position in the file/recording.
+	 * 
+	 * @return its JPanel container
+	 */
 	private JPanel createTime() {
 		JPanel panel = new JPanel();
 		this.timeLbl = new JLabel("HH:mm:ss");
@@ -260,15 +307,19 @@ public class Gui extends JFrame {
 
 	/**
 	 * Create control buttons (play/pause, record...)
+	 * 
+	 * @return their JPanel container
 	 */
 	private JPanel createControls() {
 		JPanel buttons = new JPanel();
+		// align them next to each other horizontally
 		buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 
 		recBtn = new JButton(recordIcon);
 		recBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// click on REC
 				slider.setModel(recorderPositionModel);
 
 				if (app.isRecording()) {
@@ -282,9 +333,7 @@ public class Gui extends JFrame {
 
 					if (filename == null) {
 						// user pressed the cancel button
-
-						app.discardRecording(defaultFilename);
-						app.discardRecording("tmp.ogg");
+						app.discardRecording();
 					} else {
 						if (filename.equals("")) {
 							// filename is blank but user clicked OK? Let's use
@@ -309,10 +358,16 @@ public class Gui extends JFrame {
 		playBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// "selection" is null if file list is empty
+				// click on play/pause
+
+				/*
+				 * "selection" is null if file list is empty and/or nothing
+				 * selected then nothing to do.
+				 */
 				if (selection == null) {
 					return;
 				}
+
 				if (app.isPlaying()) {
 					app.pausePlayer();
 					playBtn.setIcon(playIcon);

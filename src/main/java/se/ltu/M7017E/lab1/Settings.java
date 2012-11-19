@@ -4,7 +4,14 @@ import java.io.File;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+/**
+ * Utility class to put/get the settings using Java standardized Preferences
+ * API.
+ */
 public class Settings {
+	/**
+	 * The Java API
+	 */
 	private Preferences prefs;
 
 	/**
@@ -44,7 +51,7 @@ public class Settings {
 	/**
 	 * Get preferred folder for recording files
 	 * 
-	 * @return the path if set or the default
+	 * @return the path if set or the default one
 	 */
 	public String getRecordingFolder() {
 		String path = prefs.get("recordingFolder",
@@ -68,14 +75,25 @@ public class Settings {
 		prefs.put("recordingFolder", path);
 	}
 
+	/**
+	 * For test purpose
+	 * 
+	 * @return username or default
+	 */
 	public String getUsername() {
 		return prefs.get("username", "clem");
 	}
 
+	/**
+	 * For test purpose
+	 */
 	public void setUsername(String username) {
 		prefs.put("username", username);
 	}
 
+	/**
+	 * Clear all settings {@link Preferences#clear()}
+	 */
 	public void clear() {
 		try {
 			prefs.clear();
@@ -85,6 +103,9 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Flush settings to storage {@link Preferences#flush()}
+	 */
 	public void flush() {
 		try {
 			prefs.flush();

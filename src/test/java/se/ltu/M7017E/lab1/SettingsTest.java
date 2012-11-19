@@ -5,6 +5,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Test for the Java Preferences API. More to learn how to use it than a real
+ * test because it's supposed to be already tested by Oracle...
+ */
 public class SettingsTest {
 	@Before
 	public void clean() {
